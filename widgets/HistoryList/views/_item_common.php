@@ -2,6 +2,7 @@
 
 use app\models\User;
 use yii\helpers\Html;
+use \app\widgets\DateTime\DateTime;
 
 /* @var $user User */
 /* @var $body string */
@@ -17,7 +18,7 @@ use yii\helpers\Html;
 
         <?php if (isset($bodyDatetime)): ?>
             <span>
-       <?= \app\widgets\DateTime\DateTime::widget(['dateTime' => $bodyDatetime]) ?>
+       <?= DateTime::widget(['dateTime' => $bodyDatetime]) ?>
     </span>
         <?php endif; ?>
     </div>
@@ -34,9 +35,9 @@ use yii\helpers\Html;
 
 <?php if (isset($footer) || isset($footerDatetime)): ?>
     <div class="bg-warning">
-        <?php echo isset($footer) ? $footer : '' ?>
+        <?php echo $footer ?? '' ?>
         <?php if (isset($footerDatetime)): ?>
-            <span><?= \app\widgets\DateTime\DateTime::widget(['dateTime' => $footerDatetime]) ?></span>
+            <span><?= DateTime::widget(['dateTime' => $footerDatetime]) ?></span>
         <?php endif; ?>
     </div>
 <?php endif; ?>

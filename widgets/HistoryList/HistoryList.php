@@ -2,40 +2,73 @@
 
 namespace app\widgets\HistoryList;
 
-use app\models\search\HistorySearch;
-use app\widgets\Export\Export;
+use app\widgets\HistoryList\exceptions\InvalidExportTypeException;
+use app\widgets\HistoryList\exceptions\InvalidHistoryDataProvider;
+use kartik\export\ExportMenu;
 use yii\base\Widget;
-use yii\helpers\ArrayHelper;
+use yii\data\ActiveDataProvider;
 use yii\helpers\Url;
-use Yii;
 
 class HistoryList extends Widget
 {
     /**
+     * @var string
+     */
+    public $linkExport;
+    /**
+     * @var string
+     */
+    public $exportType;
+    /**
+     * @var array
+     */
+    private $availableExportTypes = [
+        ExportMenu::FORMAT_CSV
+    ];
+
+    /**
+     * @var ActiveDataProvider
+     */
+    public $historyDataProvider;
+
+    /**
+     * @throws InvalidExportTypeException
+     * @throws InvalidHistoryDataProvider
+     */
+    public function init()
+    {
+        if (!in_array($this->exportType, $this->availableExportTypes)) {
+            throw new InvalidExportTypeException('exportType parameter must be one of: ' .
+                join(', ', $this->availableExportTypes) . ', type ' . $this->exportType . ' given'
+            );
+        }
+
+        if (!$this->historyDataProvider) {
+            throw new InvalidHistoryDataProvider('historyDataProvider is required');
+        }
+
+        parent::init();
+    }
+
+    /**
      * @return string
      */
-    public function run()
+    public function run(): string
     {
-        $model = new HistorySearch();
-
         return $this->render('main', [
-            'model' => $model,
             'linkExport' => $this->getLinkExport(),
-            'dataProvider' => $model->search(Yii::$app->request->queryParams)
+            'historyDataProvider' => $this->historyDataProvider
         ]);
     }
 
     /**
      * @return string
      */
-    private function getLinkExport()
+    private function getLinkExport(): string
     {
-        $params = Yii::$app->getRequest()->getQueryParams();
-        $params = ArrayHelper::merge([
-            'exportType' => Export::FORMAT_CSV
-        ], $params);
-        $params[0] = 'site/export';
-
-        return Url::to($params);
+        return Url::to([
+            $this->linkExport,
+            'exportType' => $this->exportType
+        ]);
     }
 }

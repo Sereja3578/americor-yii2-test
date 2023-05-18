@@ -52,7 +52,7 @@ class History extends ActiveRecord
     /**
      * @inheritdoc
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return '{{%history}}';
     }
@@ -60,7 +60,7 @@ class History extends ActiveRecord
     /**
      * @inheritdoc
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['ins_ts'], 'safe'],
@@ -94,7 +94,7 @@ class History extends ActiveRecord
     /**
      * @return ActiveQuery
      */
-    public function getCustomer()
+    public function getCustomer(): ActiveQuery
     {
         return $this->hasOne(Customer::class, ['id' => 'customer_id']);
     }
@@ -102,7 +102,7 @@ class History extends ActiveRecord
     /**
      * @return ActiveQuery
      */
-    public function getUser()
+    public function getUser(): ActiveQuery
     {
         return $this->hasOne(User::class, ['id' => 'user_id']);
     }
@@ -110,7 +110,7 @@ class History extends ActiveRecord
     /**
      * @return array
      */
-    public static function getEventTexts()
+    public static function getEventTexts(): array
     {
         return [
             self::EVENT_CREATED_TASK => Yii::t('app', 'Task created'),
@@ -132,10 +132,10 @@ class History extends ActiveRecord
     }
 
     /**
-     * @param $event
+     * @param string $event
      * @return mixed
      */
-    public static function getEventTextByEvent($event)
+    public static function getEventTextByEvent(string $event)
     {
         return static::getEventTexts()[$event] ?? $event;
     }
@@ -148,44 +148,43 @@ class History extends ActiveRecord
         return static::getEventTextByEvent($this->event);
     }
 
-
     /**
-     * @param $attribute
+     * @param string $attribute
      * @return null
      */
-    public function getDetailChangedAttribute($attribute)
+    public function getDetailChangedAttribute(string $attribute)
     {
         $detail = json_decode($this->detail);
-        return isset($detail->changedAttributes->{$attribute}) ? $detail->changedAttributes->{$attribute} : null;
+        return $detail->changedAttributes->{$attribute} ?? null;
     }
 
     /**
-     * @param $attribute
+     * @param string $attribute
      * @return null
      */
-    public function getDetailOldValue($attribute)
+    public function getDetailOldValue(string $attribute)
     {
         $detail = $this->getDetailChangedAttribute($attribute);
-        return isset($detail->old) ? $detail->old : null;
+        return $detail->old ?? null;
     }
 
     /**
-     * @param $attribute
+     * @param string $attribute
      * @return null
      */
-    public function getDetailNewValue($attribute)
+    public function getDetailNewValue(string $attribute)
     {
         $detail = $this->getDetailChangedAttribute($attribute);
-        return isset($detail->new) ? $detail->new : null;
+        return $detail->new ?? null;
     }
 
     /**
-     * @param $attribute
+     * @param string $attribute
      * @return null
      */
-    public function getDetailData($attribute)
+    public function getDetailData(string $attribute)
     {
         $detail = json_decode($this->detail);
-        return isset($detail->data->{$attribute}) ? $detail->data->{$attribute} : null;
+        return $detail->data->{$attribute} ?? null;
     }
 }
