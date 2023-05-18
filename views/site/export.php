@@ -1,15 +1,18 @@
 <?php
 
 /**
- * @var $this yii\web\View
- * @var $model \app\models\History
- * @var $dataProvider yii\data\ActiveDataProvider
+ * @var $this View
+ * @var $model History
+ * @var $dataProvider ActiveDataProvider
  * @var $exportType string
  */
 
 use app\models\History;
 use app\widgets\Export\Export;
-use app\widgets\HistoryList\helpers\HistoryListHelper;
+use app\widgets\HistoryList\exceptions\NotFoundEventRenderereClassException;
+use app\widgets\HistoryList\HistoryEventContentRenders\HistoryEventRendererFabric;
+use yii\data\ActiveDataProvider;
+use yii\web\View;
 
 $filename = 'history';
 $filename .= '-' . time();
@@ -47,7 +50,13 @@ ini_set('memory_limit', '2048M');
         [
             'label' => Yii::t('app', 'Message'),
             'value' => function (History $model) {
-                return strip_tags(HistoryListHelper::getBodyByModel($model));
+                try {
+                    $historyEventRendererFabric = new HistoryEventRendererFabric($model, $this);
+                    $message = $historyEventRendererFabric->getRenderer()->getBody();
+                } catch (NotFoundEventRenderereClassException $e) {
+                    return '';
+                }
+                return strip_tags($message);
             }
         ]
     ],
